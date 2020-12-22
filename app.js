@@ -14,7 +14,9 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { signin, signup } = require('./controllers/user');
 const auth = require('./middlewares/auth');
 
-mongoose.connect('mongodb://localhost:27017/diplom', {
+const mongoUrl = process.env.NODE_ENV === 'production' ? process.env.MONGO_URL : 'mongodb://localhost:27017/diplom';
+
+mongoose.connect(mongoUrl, {
   useNewUrlParser: true,
   useCreateIndex: true,
   useFindAndModify: false,
@@ -43,10 +45,11 @@ app.use(auth);
 
 app.use('/', allRoutes);
 
-app.use(errors());
 app.use(errorLogger);
 
 app.all('*', () => { throw new NotFoundError('Запрашиваемый ресурс не найден'); });
+
+app.use(errors());
 
 app.use((err, req, res, next) => {
   let { statusCode = 500, message } = err;

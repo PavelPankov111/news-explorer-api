@@ -9,13 +9,15 @@ module.exports.getArticles = (req, res, next) => article.find({ owner: req.user.
 
 module.exports.postArticles = (req, res, next) => {
   const {
-    keyword, title, text, source, link, image,
+    keyword, title, text, source, link, image, date,
   } = req.body;
   return article.create({
-    keyword, title, text, source, link, image, owner: req.user._id,
+    keyword, title, text, source, link, image, owner: req.user._id, date,
   })
-    .then((card) => {
-      res.status(200).send(card);
+    .then((item) => {
+      const objItem = item.toObject();
+      const { owner, ...newItem } = objItem;
+      res.status(200).send(newItem);
     })
     .catch(next);
 };

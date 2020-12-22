@@ -19,6 +19,7 @@ router.post('/articles', celebrate({
     source: Joi.string().required(),
     link: Joi.string().required().pattern(/(http|https):\/\/(\w+:{0,1}\w*)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%!\-/]))?/),
     image: Joi.string().required().pattern(/(http|https):\/\/(\w+:{0,1}\w*)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%!\-/]))?/),
+    date: Joi.date(),
   }),
 }), postArticles);
 
