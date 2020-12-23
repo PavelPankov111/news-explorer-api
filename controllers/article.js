@@ -1,5 +1,6 @@
 const article = require('../models/article');
 const NotFoundError = require('../errors/not-found-err');
+const ForbiddenError = require('../errors/forbidden-err');
 
 module.exports.getArticles = (req, res, next) => article.find({ owner: req.user._id })
   .then((item) => {
@@ -23,12 +24,22 @@ module.exports.postArticles = (req, res, next) => {
 };
 
 module.exports.deleteArticles = (req, res, next) => {
-  article.findByIdAndRemove({ _id: req.params.cardId })
+  // article.findByIdAndRemove({ _id: req.params.cardId })
+  article.findById({ _id: req.params.cardId })
+    .select('+owner')
     .then((item) => {
       if (!item) {
-        throw new NotFoundError('Карточка с таким id не найдена');
+        throw new NotFoundError('Артикль с таким id не найден');
       }
-      res.status(200).send({ message: 'Карточка успешно удалена' });
+      const ownerStr = String(item.owner);
+      const idStr = String(req.user._id);
+
+      if (ownerStr !== idStr) {
+        throw new ForbiddenError('Вы не можете удалять чужие артикли');
+      }
+
+      article.deleteOne(item)
+        .then(() => res.send({ message: 'Артикль успешно удален' }));
     })
     .catch(next);
 };
