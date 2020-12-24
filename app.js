@@ -47,9 +47,9 @@ app.use('/', allRoutes);
 
 app.use(errorLogger);
 
-app.all('*', () => { throw new NotFoundError('Запрашиваемый ресурс не найден'); });
-
 app.use(errors());
+
+app.all('*', () => { throw new NotFoundError('Запрашиваемый ресурс не найден'); });
 
 app.use((err, req, res, next) => {
   let { statusCode = 500, message } = err;

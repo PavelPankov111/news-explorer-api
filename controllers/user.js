@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const userSchema = require('../models/user');
 const BadRequestError = require('../errors/bad-request-err');
 const NotFoundError = require('../errors/not-found-err');
+const ConflictError = require('../errors/conflict-err');
 
 module.exports.signup = (req, res, next) => {
   const {
@@ -19,7 +20,12 @@ module.exports.signup = (req, res, next) => {
         .then(() => {
           res.status(200).send({ message: 'Успешная регистрация' });
         })
-        .catch(next);
+        .catch((err) => {
+          if (err.message === 'MongoError') {
+            return next(new ConflictError('Пользователь с таким email уже зарегестрирован'));
+          }
+          return next(err);
+        });
     });
 };
 
